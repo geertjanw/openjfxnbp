@@ -1,10 +1,11 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package com.mycompany.openjfxnb.core;
 
+import java.awt.BorderLayout;
+import javafx.application.Platform;
+import javafx.embed.swing.JFXPanel;
+import javafx.scene.Scene;
+import javafx.scene.control.Label;
+import javafx.scene.layout.StackPane;
 import org.netbeans.api.settings.ConvertAsProperties;
 import org.openide.awt.ActionID;
 import org.openide.awt.ActionReference;
@@ -37,13 +38,30 @@ import org.openide.util.NbBundle.Messages;
 })
 public final class CoreTopComponent extends TopComponent {
 
+    private static JFXPanel fxContainer;
+    
+    private final String javaVersion = SystemInfo.javaVersion();
+    private final String javafxVersion = SystemInfo.javafxVersion();
+    
     public CoreTopComponent() {
         initComponents();
         setName(Bundle.CTL_CoreTopComponent());
         setToolTipText(Bundle.HINT_CoreTopComponent());
-
+        fxContainer = new JFXPanel();
+        Platform.setImplicitExit(false);
+        Platform.runLater(() -> {
+            createScene();
+        });
+        setLayout(new BorderLayout());
+        add(fxContainer, BorderLayout.CENTER);
     }
 
+    private void createScene() {
+        Label label = new Label("Hello, JavaFX " + javafxVersion + ", running on Java " + javaVersion + ".");
+        Scene scene = new Scene(new StackPane(label), 640, 480);
+        fxContainer.setScene(scene);
+    }
+    
     /**
      * This method is called from within the constructor to initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is always

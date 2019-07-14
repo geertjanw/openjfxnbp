@@ -1,14 +1,17 @@
 package com.mycompany.openjfxnb.core;
 
 import java.awt.BorderLayout;
+import java.io.IOException;
 import javafx.application.Platform;
 import javafx.embed.swing.JFXPanel;
+import javafx.fxml.FXMLLoader;
+import javafx.scene.Parent;
 import javafx.scene.Scene;
-import javafx.scene.control.Label;
 import javafx.scene.layout.StackPane;
 import org.netbeans.api.settings.ConvertAsProperties;
 import org.openide.awt.ActionID;
 import org.openide.awt.ActionReference;
+import org.openide.util.Exceptions;
 import org.openide.windows.TopComponent;
 import org.openide.util.NbBundle.Messages;
 
@@ -40,9 +43,6 @@ public final class CoreTopComponent extends TopComponent {
 
     private static JFXPanel fxContainer;
     
-    private final String javaVersion = SystemInfo.javaVersion();
-    private final String javafxVersion = SystemInfo.javafxVersion();
-    
     public CoreTopComponent() {
         initComponents();
         setName(Bundle.CTL_CoreTopComponent());
@@ -50,17 +50,27 @@ public final class CoreTopComponent extends TopComponent {
         fxContainer = new JFXPanel();
         Platform.setImplicitExit(false);
         Platform.runLater(() -> {
-            createScene();
+            try {
+                setRoot("primary");
+            } catch (IOException ex) {
+                Exceptions.printStackTrace(ex);
+            }
         });
         setLayout(new BorderLayout());
         add(fxContainer, BorderLayout.CENTER);
     }
 
-    private void createScene() {
-        Label label = new Label("Hello, JavaFX " + javafxVersion + ", running on Java " + javaVersion + ".");
-        Scene scene = new Scene(new StackPane(label), 640, 480);
+    static void setRoot(String fxml) throws IOException {
+        Scene scene = new Scene(new StackPane(), 640, 480);
         fxContainer.setScene(scene);
+        scene.setRoot(loadFXML(fxml));
     }
+    
+     private static Parent loadFXML(String fxml) throws IOException {
+        FXMLLoader fxmlLoader = new FXMLLoader(CoreTopComponent.class.getResource(fxml + ".fxml"));
+        return fxmlLoader.load();
+    }
+
     
     /**
      * This method is called from within the constructor to initialize the form.
